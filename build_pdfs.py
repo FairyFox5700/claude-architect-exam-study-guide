@@ -1,23 +1,40 @@
-import markdown, os, re, json
+import base64, markdown, os, re, json
 
 ROOT = r"C:\Users\ityshchenko\OneDrive - Microsoft\Documents\Microsoft Scout\claude-architect-exam-study-guide"
 HTML_OUT = os.path.join(ROOT, "_pdf_build_html")
 os.makedirs(HTML_OUT, exist_ok=True)
+
+FONT_PATH = os.path.join(ROOT, "assets", "fonts", "Manrope-Variable.woff2")
+with open(FONT_PATH, "rb") as f:
+    MANROPE_BASE64 = base64.b64encode(f.read()).decode("ascii")
+
+# Font is embedded as a base64 data URI so rendering never depends on a
+# network fetch (this is what caused inconsistent/fallback-font readability
+# issues before). It's a variable font, so one @font-face covers the whole
+# 400-800 weight range used across the page.
+FONT_FACE = f"""
+@font-face {{
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: block;
+  src: url(data:font/woff2;base64,{MANROPE_BASE64}) format('woff2-variations');
+}}
+"""
 
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>{title}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+__FONT_FACE__
   :root {{
     --navy: #1B2A6B;
     --orange: #E87A2D;
     --peach: #FFE8E0;
     --slate: #24304F;
-    --muted: #5B6475;
+    --muted: #434E68;
     --green: #2F9E58;
     --green-bg: #EAF7EE;
   }}
@@ -27,8 +44,10 @@ TEMPLATE = """<!DOCTYPE html>
     color: var(--slate);
     margin: 0;
     padding: 36px 48px 56px 48px;
-    font-size: 11.5pt;
-    line-height: 1.5;
+    font-size: 12pt;
+    font-weight: 500;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
   }}
   .eyebrow {{
     display: inline-block;
@@ -60,7 +79,8 @@ TEMPLATE = """<!DOCTYPE html>
     margin: 0 0 18px 0;
     padding: 10px 16px;
     color: var(--slate);
-    font-size: 11pt;
+    font-size: 11.5pt;
+    font-weight: 500;
     border-radius: 0 6px 6px 0;
   }}
   h2 {{
@@ -127,16 +147,16 @@ TEMPLATE = """<!DOCTYPE html>
     background: var(--orange);
     color: #fff;
     font-weight: 800;
-    font-size: 9.5pt;
+    font-size: 10pt;
     padding: 3px 10px;
     border-radius: 999px;
     letter-spacing: 0.02em;
   }}
   .qtext {{
     font-weight: 700;
-    font-size: 11pt;
+    font-size: 12pt;
     color: #fff;
-    line-height: 1.4;
+    line-height: 1.45;
   }}
   .options {{
     list-style: none;
@@ -147,9 +167,10 @@ TEMPLATE = """<!DOCTYPE html>
     display: flex;
     gap: 8px;
     align-items: flex-start;
-    margin: 5px 0;
-    font-size: 10.3pt;
-    padding: 4px 8px;
+    margin: 6px 0;
+    font-size: 11pt;
+    font-weight: 500;
+    padding: 5px 8px;
     border-radius: 6px;
   }}
   .options li.correct {{
@@ -185,14 +206,14 @@ TEMPLATE = """<!DOCTYPE html>
   .answer-line {{
     font-weight: 800;
     color: var(--green);
-    font-size: 10.5pt;
+    font-size: 11.5pt;
     margin-bottom: 6px;
   }}
   .answer-line .tag {{
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 8pt;
+    font-size: 8.5pt;
     font-weight: 800;
     color: #fff;
     background: var(--green);
@@ -202,14 +223,15 @@ TEMPLATE = """<!DOCTYPE html>
   }}
   .explanation {{
     color: var(--muted);
-    font-size: 10pt;
-    line-height: 1.45;
+    font-size: 10.8pt;
+    font-weight: 500;
+    line-height: 1.5;
   }}
   .explanation .tag {{
     display: inline-block;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-size: 8pt;
+    font-size: 8.5pt;
     font-weight: 800;
     color: var(--navy);
     background: var(--peach);
@@ -322,6 +344,7 @@ def build(md_path, html_path):
     title, body = md_to_html(md_path)
     os.makedirs(os.path.dirname(html_path), exist_ok=True)
     html = TEMPLATE.format(title=title, body=body)
+    html = html.replace("__FONT_FACE__", FONT_FACE)
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
 
