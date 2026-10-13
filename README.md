@@ -23,6 +23,16 @@ For deeper, focused practice, every individual objective also has its own
 dedicated page with 15 questions: see the
 **[Objectives Index](docs/objectives/README.md)** (37 pages, 555 questions).
 
+## PDF versions
+
+Every page above also has a branded, print-ready PDF version (Manrope typeface,
+Iryna Tyshchenko's navy/peach/orange color palette, LinkedIn footer) in the
+[`pdf/`](pdf/) folder, mirroring the same folder structure:
+
+- [`pdf/README.pdf`](pdf/README.pdf)
+- [`pdf/docs/`](pdf/docs/) — the 5 section pages
+- [`pdf/docs/objectives/`](pdf/docs/objectives/) — all 37 objective pages + index
+
 ## How to use this guide
 
 - Each page is self-contained: question, four answer options (A–D), the
