@@ -18,6 +18,8 @@ TEMPLATE = """<!DOCTYPE html>
     --peach: #FFE8E0;
     --slate: #24304F;
     --muted: #5B6475;
+    --green: #2F9E58;
+    --green-bg: #EAF7EE;
   }}
   * {{ box-sizing: border-box; }}
   body {{
@@ -47,7 +49,6 @@ TEMPLATE = """<!DOCTYPE html>
     margin: 0 0 4px 0;
     line-height: 1.25;
   }}
-  h1 .accent {{ color: var(--orange); }}
   .subtitle {{
     color: var(--muted);
     font-size: 11pt;
@@ -66,20 +67,13 @@ TEMPLATE = """<!DOCTYPE html>
     color: var(--navy);
     font-size: 15pt;
     font-weight: 800;
-    margin: 24px 0 10px 0;
+    margin: 24px 0 12px 0;
     border-bottom: 2px solid var(--peach);
     padding-bottom: 6px;
   }}
-  h3 {{
-    color: var(--navy);
-    font-size: 12.5pt;
-    font-weight: 700;
-    margin: 20px 0 6px 0;
-    page-break-after: avoid;
-  }}
   p {{ margin: 6px 0; }}
-  ul, ol {{ margin: 6px 0; padding-left: 22px; }}
-  li {{ margin: 2px 0; }}
+  ul.plain, ol {{ margin: 6px 0; padding-left: 22px; }}
+  ul.plain li {{ margin: 2px 0; }}
   table {{
     width: 100%;
     border-collapse: collapse;
@@ -104,15 +98,124 @@ TEMPLATE = """<!DOCTYPE html>
     border-top: 2px solid var(--peach);
     margin: 20px 0;
   }}
-  .question-block {{
-    page-break-inside: avoid;
-    margin-bottom: 14px;
-  }}
   code {{
     background: #F0F1F6;
     padding: 1px 5px;
     border-radius: 4px;
     font-size: 10pt;
+  }}
+
+  /* ---- Question cards ---- */
+  .qcard {{
+    page-break-inside: avoid;
+    margin: 0 0 16px 0;
+    border: 1px solid #E3E6F0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FCFCFE;
+  }}
+  .qhead {{
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    background: var(--navy);
+    color: #fff;
+    padding: 8px 14px;
+  }}
+  .qnum {{
+    flex-shrink: 0;
+    background: var(--orange);
+    color: #fff;
+    font-weight: 800;
+    font-size: 9.5pt;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }}
+  .qtext {{
+    font-weight: 700;
+    font-size: 11pt;
+    color: #fff;
+    line-height: 1.4;
+  }}
+  .options {{
+    list-style: none;
+    margin: 0;
+    padding: 10px 14px 4px 14px;
+  }}
+  .options li {{
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin: 5px 0;
+    font-size: 10.3pt;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }}
+  .options li.correct {{
+    background: var(--green-bg);
+  }}
+  .optletter {{
+    flex-shrink: 0;
+    background: #EEF0F8;
+    color: var(--navy);
+    font-weight: 800;
+    border-radius: 50%;
+    width: 19px;
+    height: 19px;
+    min-width: 19px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9pt;
+  }}
+  .options li.correct .optletter {{
+    background: var(--green);
+    color: #fff;
+  }}
+  .opttext {{ padding-top: 1px; }}
+  .options li.correct .opttext {{ font-weight: 700; color: var(--slate); }}
+  .answerbox {{
+    margin: 8px 14px 14px 14px;
+    background: #FFF4EC;
+    border-left: 4px solid var(--orange);
+    border-radius: 0 8px 8px 0;
+    padding: 9px 13px;
+  }}
+  .answer-line {{
+    font-weight: 800;
+    color: var(--green);
+    font-size: 10.5pt;
+    margin-bottom: 6px;
+  }}
+  .answer-line .tag {{
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 8pt;
+    font-weight: 800;
+    color: #fff;
+    background: var(--green);
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-right: 8px;
+  }}
+  .explanation {{
+    color: var(--muted);
+    font-size: 10pt;
+    line-height: 1.45;
+  }}
+  .explanation .tag {{
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 8pt;
+    font-weight: 800;
+    color: var(--navy);
+    background: var(--peach);
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-right: 8px;
   }}
 </style>
 </head>
@@ -123,32 +226,96 @@ TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
-HEADER_TEMPLATE = """
-<div style="font-size:8px; width:100%; padding:4px 36px 0 36px; color:#5B6475; font-family: Manrope, Arial, sans-serif; display:flex; justify-content:space-between;">
-  <span>Claude Certified Architect &ndash; Foundations: Exam Study Guide</span>
-  <span>Iryna Tyshchenko</span>
-</div>
-"""
 
-FOOTER_TEMPLATE = """
-<div style="font-size:8px; width:100%; padding:0 36px 6px 36px; color:#ffffff; background:#1B2A6B; font-family: Manrope, Arial, sans-serif; display:flex; justify-content:space-between; align-items:center;">
-  <span>in/iryna-tyshchenko &middot; LinkedIn</span>
-  <span class="pageNumber"></span>/<span class="totalPages"></span>
-</div>
-"""
+def inline_md(text):
+    """Render inline markdown (bold, code, links) and strip the wrapping <p> tag."""
+    text = text.strip()
+    if not text:
+        return ""
+    html = markdown.markdown(text, extensions=["fenced_code"])
+    html = re.sub(r"^<p>(.*)</p>$", r"\1", html.strip(), flags=re.DOTALL)
+    return html
+
+
+def parse_questions(body_text):
+    """Split a page body into the intro (title/blockquote/table) and a list of
+    parsed question dicts, rendering each question as a styled card."""
+    parts = re.split(r"\n(?=###\s+Q\d+\.)", body_text)
+    pre = parts[0]
+    q_blocks = parts[1:]
+
+    questions = []
+    for block in q_blocks:
+        m = re.match(r"###\s+Q(\d+)\.?\s*\n(.*)", block, re.DOTALL)
+        if not m:
+            continue
+        qnum = m.group(1)
+        rest = m.group(2)
+
+        ans_m = re.search(r"\*\*Answer:\*\*\s*([A-D])", rest)
+        exp_m = re.search(r"\*\*Explanation:\*\*\s*(.+?)(?:\n###\s+Q\d+\.|\Z)", rest, re.DOTALL)
+
+        answer_letter = ans_m.group(1) if ans_m else "?"
+        explanation_raw = exp_m.group(1).strip() if exp_m else ""
+        explanation_raw = re.sub(r"\n+", " ", explanation_raw).strip()
+
+        qa_text = rest[: ans_m.start()] if ans_m else rest
+        opt_matches = re.findall(r"^([A-D])\.\s*(.+)$", qa_text, re.MULTILINE)
+        question_text_raw = re.sub(r"^[A-D]\.\s*.+$", "", qa_text, flags=re.MULTILINE).strip()
+        question_text_raw = re.sub(r"\n+", " ", question_text_raw).strip()
+
+        questions.append({
+            "num": qnum,
+            "question": inline_md(question_text_raw),
+            "options": [(letter, inline_md(text)) for letter, text in opt_matches],
+            "answer": answer_letter,
+            "explanation": inline_md(explanation_raw),
+        })
+    return pre, questions
+
+
+def render_question_card(q):
+    opts_html = ""
+    for letter, text in q["options"]:
+        correct = "correct" if letter == q["answer"] else ""
+        opts_html += (
+            f'<li class="{correct}">'
+            f'<span class="optletter">{letter}</span>'
+            f'<span class="opttext">{text}</span></li>'
+        )
+    return f"""
+    <div class="qcard">
+      <div class="qhead"><span class="qnum">Q{q['num']}</span><div class="qtext">{q['question']}</div></div>
+      <ul class="options">{opts_html}</ul>
+      <div class="answerbox">
+        <div class="answer-line"><span class="tag">Correct answer</span>{q['answer']}</div>
+        <div class="explanation"><span class="tag">Why</span>{q['explanation']}</div>
+      </div>
+    </div>
+    """
 
 
 def md_to_html(md_path):
     with open(md_path, "r", encoding="utf-8") as f:
         text = f.read()
-    # Extract H1 title for <title> tag and split into accent word (last word colored orange)
     m = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
     raw_title = m.group(1).strip() if m else os.path.basename(md_path)
-    # strip nav links lines like "[← Back ...]" so they don't clutter the PDF
+
+    # strip nav link lines so they don't clutter the PDF
     text = re.sub(r"^\[.*Back to.*\].*$", "", text, flags=re.MULTILINE)
     text = re.sub(r"^\[.*Next:.*\].*$", "", text, flags=re.MULTILINE)
-    html_body = markdown.markdown(text, extensions=["tables", "fenced_code"])
-    return raw_title, html_body
+
+    pre_text, questions = parse_questions(text)
+
+    pre_html = markdown.markdown(pre_text, extensions=["tables", "fenced_code"])
+    pre_html = pre_html.replace("<ul>", '<ul class="plain">')
+
+    if questions:
+        body = pre_html + "".join(render_question_card(q) for q in questions)
+    else:
+        body = pre_html
+
+    return raw_title, body
 
 
 def build(md_path, html_path):
